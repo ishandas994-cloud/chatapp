@@ -11,7 +11,7 @@ A real-time WhatsApp-style chat app with 1-on-1 messaging, group chats, media sh
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/YOUR_USERNAME/chatapp.git
+git clone https://github.com/ishandas994-cloud/chatapp.git
 cd chatapp
 ```
 
