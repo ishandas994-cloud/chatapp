@@ -1,0 +1,10 @@
+{
+  "short_name": "ChatApp",
+  "name": "ChatApp — Real-time Messaging",
+  "icons": [{ "src": "favicon.ico", "sizes": "64x64", "type": "image/x-icon" }],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0d0d14",
+  "background_color": "#0d0d14",
+  "orientation": "any"
+}
