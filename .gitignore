@@ -12,3 +12,4 @@ yarn-error.log*
 .vercel/
 uploads/
 *.log
+frontend/package-lock.json
