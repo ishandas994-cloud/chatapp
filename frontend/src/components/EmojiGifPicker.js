@@ -30,3 +30,25 @@ export default function EmojiGifPicker({ onEmojiSelect, onGifSelect, onStickerSe
     } catch {}
     setGifLoading(false);
   };
+  const fetchStickers = async (query) => {
+    if (!TENOR_KEY) return;
+    setGifLoading(true);
+    try {
+      const res  = await fetch(
+        `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query)}&key=${TENOR_KEY}&limit=20&media_filter=gif&searchfilter=sticker`
+      );
+      const data = await res.json();
+      setStickers(data.results || []);
+    } catch {}
+    setGifLoading(false);
+  };
+
+  const handleGifSearch = (e) => {
+    const val = e.target.value;
+    setGifSearch(val);
+    clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      if (val.trim()) fetchGifs(val.trim());
+      else fetchGifs('trending', false);
+    }, 400);
+  };
