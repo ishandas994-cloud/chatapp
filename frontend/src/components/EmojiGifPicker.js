@@ -228,3 +228,19 @@ const styles = {
     transition: 'transform 0.15s, opacity 0.15s',
     background: 'var(--bg-elevated)',
   },
+   loading: {
+    textAlign: 'center',
+    color: 'var(--text-muted)',
+    padding: '2rem',
+    fontSize: '0.85rem',
+  },
+  noKey: {
+    textAlign: 'center',
+    color: 'var(--accent-2)',
+    padding: '1rem',
+    fontSize: '0.78rem',
+    background: 'rgba(255,101,132,0.08)',
+    borderRadius: '10px',
+    border: '1px solid rgba(255,101,132,0.2)',
+  },
+};
