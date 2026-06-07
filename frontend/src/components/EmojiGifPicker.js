@@ -52,3 +52,67 @@ export default function EmojiGifPicker({ onEmojiSelect, onGifSelect, onStickerSe
       else fetchGifs('trending', false);
     }, 400);
   };
+  const getGifUrl = (result) =>
+    result?.media_formats?.gif?.url ||
+    result?.media_formats?.tinygif?.url || '';
+
+  return (
+    <div style={styles.container}>
+      {/* Tabs */}
+      <div style={styles.tabs}>
+        {['emoji', 'gif', 'sticker'].map(t => (
+          <button key={t} style={{ ...styles.tab, ...(tab === t ? styles.tabActive : {}) }}
+            onClick={() => setTab(t)}>
+            {t === 'emoji' ? '😀 Emoji' : t === 'gif' ? '🎞️ GIF' : '🎨 Sticker'}
+          </button>
+        ))}
+      </div>
+
+      {/* Emoji Tab */}
+      {tab === 'emoji' && (
+        <div style={styles.emojiWrap}>
+          <EmojiPicker
+            onEmojiClick={(emojiData) => onEmojiSelect(emojiData.emoji)}
+            theme="dark"
+            skinTonesDisabled
+            searchPlaceHolder="Search emoji..."
+            width="100%"
+            height={380}
+            previewConfig={{ showPreview: false }}
+            style={{ background: 'var(--bg-elevated)', border: 'none' }}
+          />
+        </div>
+      )}
+
+      {/* GIF Tab */}
+      {tab === 'gif' && (
+        <div style={styles.mediaTab}>
+          <input
+            style={styles.searchInput}
+            placeholder="🔍  Search GIFs..."
+            value={gifSearch}
+            onChange={handleGifSearch}
+            autoFocus
+          />
+          {!TENOR_KEY && (
+            <div style={styles.noKey}>
+              Add REACT_APP_TENOR_API_KEY to .env to enable GIFs
+            </div>
+          )}
+          {gifLoading ? (
+            <div style={styles.loading}>Loading...</div>
+          ) : (
+            <div style={styles.grid}>
+              {gifs.map(gif => {
+                const url = getGifUrl(gif);
+                return url ? (
+                  <img key={gif.id} src={url} alt={gif.title}
+                    style={styles.gridItem}
+                    onClick={() => onGifSelect(url)}
+                  />
+                ) : null;
+              })}
+            </div>
+          )}
+        </div>
+      )}
