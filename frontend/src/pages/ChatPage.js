@@ -17,3 +17,11 @@ function Avatar({ user, size = 44, online = false }) {
     </div>
   );
 }
+const fmtTime = (d) => new Date(d).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+const fmtDay  = (d) => {
+  const t = new Date(), x = new Date(d);
+  const y = new Date(t); y.setDate(y.getDate()-1);
+  if (x.toDateString() === t.toDateString()) return 'Today';
+  if (x.toDateString() === y.toDateString()) return 'Yesterday';
+  return x.toLocaleDateString([], { month:'short', day:'numeric' });
+};
