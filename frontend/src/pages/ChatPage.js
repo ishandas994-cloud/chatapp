@@ -55,4 +55,8 @@ export default function ChatPage() {
   const typingTimer = useRef(null);
   const fileRef     = useRef(null);
   const pickerRef   = useRef(null);
-  
+   // ── Load chats ────────────────────────────────────────────────────────────
+  const loadChats = useCallback(() =>
+    axios.get('/api/chats').then(r => setChats(r.data)).catch(() => {}), []);
+
+  useEffect(() => { loadChats(); }, [loadChats]);
