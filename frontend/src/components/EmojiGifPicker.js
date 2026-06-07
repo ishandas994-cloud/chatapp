@@ -155,3 +155,33 @@ export default function EmojiGifPicker({ onEmojiSelect, onGifSelect, onStickerSe
     </div>
   );
 }
+const styles = {
+  container: {
+    position: 'absolute',
+    bottom: '64px',
+    left: '8px',
+    width: '360px',
+    background: 'var(--bg-surface)',
+    border: '1px solid var(--border)',
+    borderRadius: '20px',
+    boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
+    overflow: 'hidden',
+    zIndex: 100,
+    animation: 'msgPop 0.2s cubic-bezier(0.34,1.56,0.64,1)',
+  },
+  tabs: {
+    display: 'flex',
+    borderBottom: '1px solid var(--border)',
+  },
+  tab: {
+    flex: 1,
+    padding: '0.65rem 0',
+    background: 'transparent',
+    border: 'none',
+    color: 'var(--text-secondary)',
+    fontFamily: 'var(--font)',
+    fontSize: '0.82rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+  },
