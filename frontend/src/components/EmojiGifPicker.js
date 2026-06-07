@@ -116,3 +116,42 @@ export default function EmojiGifPicker({ onEmojiSelect, onGifSelect, onStickerSe
           )}
         </div>
       )}
+
+      {/* Sticker Tab */}
+      {tab === 'sticker' && (
+        <div style={styles.mediaTab}>
+          <input
+            style={styles.searchInput}
+            placeholder="🔍  Search stickers..."
+            onChange={(e) => {
+              clearTimeout(searchTimer.current);
+              searchTimer.current = setTimeout(() =>
+                fetchStickers(e.target.value || 'trending'), 400);
+            }}
+            autoFocus
+          />
+          {!TENOR_KEY && (
+            <div style={styles.noKey}>
+              Add REACT_APP_TENOR_API_KEY to .env to enable Stickers
+            </div>
+          )}
+          {gifLoading ? (
+            <div style={styles.loading}>Loading...</div>
+          ) : (
+            <div style={styles.grid}>
+              {stickers.map(s => {
+                const url = getGifUrl(s);
+                return url ? (
+                  <img key={s.id} src={url} alt={s.title}
+                    style={{ ...styles.gridItem, background: 'transparent' }}
+                    onClick={() => onStickerSelect(url)}
+                  />
+                ) : null;
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
