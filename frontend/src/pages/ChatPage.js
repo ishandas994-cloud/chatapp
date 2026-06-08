@@ -165,3 +165,20 @@ export default function ChatPage() {
     socket.onIncomingCall(cb);
     return () => socket.offIncomingCall(cb);
   }, [socket]);
+   // ── Load messages + mark read when chat opens ─────────────────────────────
+  useEffect(() => {
+    if (!active) return;
+    socket.joinChat(active._id);
+    axios.get(`/api/messages/${active._id}`).then(r => {
+      setMessages(r.data);
+
+      // Mark all unread messages as read
+      const unreadIds = r.data
+        .filter(m => {
+          const sid = m.sender?._id || m.sender;
+          return sid !== user._id &&
+            !(m.readBy || []).some(id =>
+              (typeof id === 'object' ? id._id : id) === user._id
+            );
+        })
+        .map(m => m._id);
