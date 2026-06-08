@@ -114,3 +114,13 @@ export default function ChatPage() {
     axios.get('/api/chats').then(r => setChats(r.data)).catch(() => {}), []);
 
   useEffect(() => { loadChats(); }, [loadChats]);
+
+  // ── Socket: incoming message ──────────────────────────────────────────────
+  useEffect(() => {
+    const onMsg = (msg) => {
+      setMessages(prev => [...prev, msg]);
+      setChats(prev =>
+        prev.map(c => c._id === msg.chatId
+          ? { ...c, lastMessage: msg, updatedAt: msg.createdAt } : c)
+          .sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      );
