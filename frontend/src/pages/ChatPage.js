@@ -81,3 +81,23 @@ const chatName  = (chat, uid) =>
   chat.isGroup ? chat.name : chat.members?.find(m => m._id !== uid)?.name || 'Unknown';
 const otherUser = (chat, uid) =>
   chat.isGroup ? null : chat.members?.find(m => m._id !== uid);
+// ── Main Component ────────────────────────────────────────────────────────────
+export default function ChatPage() {
+  const { user, logout } = useAuth();
+  const socket           = useSocket();
+
+  const [chats,       setChats]       = useState([]);
+  const [active,      setActive]      = useState(null);
+  const [messages,    setMessages]    = useState([]);
+  const [input,       setInput]       = useState('');
+  const [typing,      setTyping]      = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showDirect,  setShowDirect]  = useState(false);
+  const [showGroup,   setShowGroup]   = useState(false);
+  const [showPicker,  setShowPicker]  = useState(false);
+  const [searchQ,     setSearchQ]     = useState('');
+  const [searchRes,   setSearchRes]   = useState([]);
+  const [groupName,   setGroupName]   = useState('');
+  const [picked,      setPicked]      = useState([]);
+  const [callState,   setCallState]   = useState(null);
+  const [inCall,      setInCall]      = useState(null);
