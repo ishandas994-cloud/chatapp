@@ -26,38 +26,44 @@ export function SocketProvider({ children }) {
 
   const s = socketRef;
 
-  const joinChat       = (id)   => s.current?.emit('chat:join', id);
-  const sendMessage    = (msg)  => s.current?.emit('message:send', msg);
-  const startTyping    = (cid)  => s.current?.emit('typing:start', { chatId: cid, userId: user._id, userName: user.name });
-  const stopTyping     = (cid)  => s.current?.emit('typing:stop',  { chatId: cid, userId: user._id });
+  const joinChat       = (id)  => s.current?.emit('chat:join', id);
+  const sendMessage    = (msg) => s.current?.emit('message:send', msg);
+  const startTyping    = (cid) => s.current?.emit('typing:start', { chatId: cid, userId: user._id, userName: user.name });
+  const stopTyping     = (cid) => s.current?.emit('typing:stop',  { chatId: cid, userId: user._id });
 
-  const onMessage      = (cb)   => s.current?.on('message:receive', cb);
-  const offMessage     = (cb)   => s.current?.off('message:receive', cb);
-  const onTypingStart  = (cb)   => s.current?.on('typing:start', cb);
-  const offTypingStart = (cb)   => s.current?.off('typing:start', cb);
-  const onTypingStop   = (cb)   => s.current?.on('typing:stop', cb);
-  const offTypingStop  = (cb)   => s.current?.off('typing:stop', cb);
+  // Read receipts
+  const emitRead       = (chatId, messageIds) => s.current?.emit('messages:read', { chatId, messageIds, userId: user._id });
+  const onMessagesRead = (cb) => s.current?.on('messages:read', cb);
+  const offMessagesRead= (cb) => s.current?.off('messages:read', cb);
+
+  const onMessage      = (cb)  => s.current?.on('message:receive', cb);
+  const offMessage     = (cb)  => s.current?.off('message:receive', cb);
+  const onTypingStart  = (cb)  => s.current?.on('typing:start', cb);
+  const offTypingStart = (cb)  => s.current?.off('typing:start', cb);
+  const onTypingStop   = (cb)  => s.current?.on('typing:stop', cb);
+  const offTypingStop  = (cb)  => s.current?.off('typing:stop', cb);
 
   // WebRTC call events
-  const initiateCall   = (d)    => s.current?.emit('call:initiate', d);
-  const answerCall     = (d)    => s.current?.emit('call:answer', d);
-  const rejectCall     = (d)    => s.current?.emit('call:reject', d);
-  const endCall        = (d)    => s.current?.emit('call:end', d);
-  const sendIce        = (d)    => s.current?.emit('call:ice-candidate', d);
+  const initiateCall   = (d)   => s.current?.emit('call:initiate', d);
+  const answerCall     = (d)   => s.current?.emit('call:answer', d);
+  const rejectCall     = (d)   => s.current?.emit('call:reject', d);
+  const endCall        = (d)   => s.current?.emit('call:end', d);
+  const sendIce        = (d)   => s.current?.emit('call:ice-candidate', d);
 
-  const onIncomingCall  = (cb)  => s.current?.on('call:incoming', cb);
-  const offIncomingCall = (cb)  => s.current?.off('call:incoming', cb);
-  const onCallAnswered  = (cb)  => s.current?.on('call:answered', cb);
-  const offCallAnswered = (cb)  => s.current?.off('call:answered', cb);
-  const onCallRejected  = (cb)  => s.current?.on('call:rejected', cb);
-  const onCallEnded     = (cb)  => s.current?.on('call:ended', cb);
-  const onIce           = (cb)  => s.current?.on('call:ice-candidate', cb);
-  const offIce          = (cb)  => s.current?.off('call:ice-candidate', cb);
+  const onIncomingCall  = (cb) => s.current?.on('call:incoming', cb);
+  const offIncomingCall = (cb) => s.current?.off('call:incoming', cb);
+  const onCallAnswered  = (cb) => s.current?.on('call:answered', cb);
+  const offCallAnswered = (cb) => s.current?.off('call:answered', cb);
+  const onCallRejected  = (cb) => s.current?.on('call:rejected', cb);
+  const onCallEnded     = (cb) => s.current?.on('call:ended', cb);
+  const onIce           = (cb) => s.current?.on('call:ice-candidate', cb);
+  const offIce          = (cb) => s.current?.off('call:ice-candidate', cb);
 
   return (
     <SocketContext.Provider value={{
       onlineUsers,
       joinChat, sendMessage, startTyping, stopTyping,
+      emitRead, onMessagesRead, offMessagesRead,
       onMessage, offMessage,
       onTypingStart, offTypingStart, onTypingStop, offTypingStop,
       initiateCall, answerCall, rejectCall, endCall, sendIce,
