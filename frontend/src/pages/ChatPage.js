@@ -39,3 +39,13 @@ function Ticks({ msg, currentUserId }) {
       </span>
     );
   }
+   // Double grey ticks — delivered
+  return (
+    <span style={tick.wrap} title="Delivered">
+      <svg style={{ ...tick.svg, width:18 }} viewBox="0 0 20 11">
+        <path d="M1 5.5L5.5 10L15 1"  style={{ ...tick.path, stroke:'#888' }} />
+        <path d="M5 5.5L9.5 10L19 1"  style={{ ...tick.path, stroke:'#888' }} />
+      </svg>
+    </span>
+  );
+}
