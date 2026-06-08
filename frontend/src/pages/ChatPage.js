@@ -4,3 +4,27 @@ import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import CallUI from '../components/CallUI';
 import EmojiGifPicker from '../components/EmojiGifPicker';
+// ── Tick component ────────────────────────────────────────────────────────────
+// grey single  = sent (delivered to server)
+// grey double  = delivered (other user received in their client)
+// blue double  = seen (other user opened the chat)
+function Ticks({ msg, currentUserId }) {
+  const isOut = (msg.sender?._id || msg.sender) === currentUserId;
+  if (!isOut) return null;
+
+  const readBy   = msg.readBy || [];
+  // readBy includes sender always — seen = someone OTHER than sender has read it
+  const seenByOther = readBy.some(id =>
+    (typeof id === 'object' ? id._id : id) !== currentUserId
+  );
+
+  // Single grey tick — just sent
+  if (!msg._id || msg._pending) {
+    return (
+      <span style={tick.wrap} title="Sending">
+        <svg style={tick.svg} viewBox="0 0 16 11">
+          <path d="M1 5.5L5.5 10L15 1" style={{ ...tick.path, stroke:'#888' }} />
+        </svg>
+      </span>
+    );
+  }
