@@ -53,6 +53,10 @@ io.on('connection', (socket) => {
 
   socket.on('typing:stop', ({ chatId, userId }) =>
     socket.to(chatId).emit('typing:stop', { userId }));
+  // Read receipts
+  socket.on('messages:read', ({ chatId, messageIds, userId }) => {
+    socket.to(chatId).emit('messages:read', { messageIds, userId });
+  });
 
   // WebRTC signaling
   const relay = (event) => socket.on(event, ({ to, ...rest }) => {
