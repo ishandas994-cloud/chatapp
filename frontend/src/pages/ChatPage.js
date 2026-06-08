@@ -101,3 +101,11 @@ export default function ChatPage() {
   const [picked,      setPicked]      = useState([]);
   const [callState,   setCallState]   = useState(null);
   const [inCall,      setInCall]      = useState(null);
+   const endRef      = useRef(null);
+  const typingTimer = useRef(null);
+  const fileRef     = useRef(null);
+  const pickerRef   = useRef(null);
+  const activeRef   = useRef(null); // always current active chat
+
+  // Keep activeRef in sync
+  useEffect(() => { activeRef.current = active; }, [active]);
