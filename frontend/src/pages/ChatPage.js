@@ -28,3 +28,14 @@ function Ticks({ msg, currentUserId }) {
       </span>
     );
   }
+  // Double blue ticks — seen
+  if (seenByOther) {
+    return (
+      <span style={tick.wrap} title="Seen">
+        <svg style={{ ...tick.svg, width:18 }} viewBox="0 0 20 11">
+          <path d="M1 5.5L5.5 10L15 1"   style={{ ...tick.path, stroke:'#60a5fa' }} />
+          <path d="M5 5.5L9.5 10L19 1"   style={{ ...tick.path, stroke:'#60a5fa' }} />
+        </svg>
+      </span>
+    );
+  }
