@@ -145,3 +145,17 @@ export default function ChatPage() {
       socket.offTypingStop(onTStop);
     };
   }, [socket, user._id]);
+   // ── Socket: read receipts from other user ─────────────────────────────────
+  useEffect(() => {
+    const onRead = ({ messageIds, userId }) => {
+      setMessages(prev =>
+        prev.map(m =>
+          messageIds.includes(m._id)
+            ? { ...m, readBy: [...(m.readBy || []), userId] }
+            : m
+        )
+      );
+    };
+    socket.onMessagesRead(onRead);
+    return () => socket.offMessagesRead(onRead);
+  }, [socket]);
