@@ -182,3 +182,13 @@ export default function ChatPage() {
             );
         })
         .map(m => m._id);
+ if (unreadIds.length > 0) {
+        socket.emitRead(active._id, unreadIds);
+      }
+    }).catch(() => {});
+  }, [active, socket, user._id]);
+
+  // ── Auto scroll ───────────────────────────────────────────────────────────
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
