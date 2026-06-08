@@ -49,3 +49,9 @@ function Ticks({ msg, currentUserId }) {
     </span>
   );
 }
+
+const tick = {
+  wrap: { display:'inline-flex', alignItems:'center', marginLeft:4, verticalAlign:'middle' },
+  svg:  { width:16, height:11, fill:'none' },
+  path: { strokeWidth:2, strokeLinecap:'round', strokeLinejoin:'round' },
+};
