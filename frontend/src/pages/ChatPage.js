@@ -124,3 +124,24 @@ export default function ChatPage() {
           ? { ...c, lastMessage: msg, updatedAt: msg.createdAt } : c)
           .sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt))
       );
+        // If this chat is currently open → immediately mark as read
+      if (activeRef.current?._id === msg.chatId) {
+        socket.emitRead(msg.chatId, [msg._id]);
+        axios.post(`/api/messages/read`, { chatId: msg.chatId }).catch(() => {});
+      }
+    };
+
+    const onTStart = ({ userId, userName }) => {
+      if (userId !== user._id) setTyping(`${userName} is typing...`);
+    };
+    const onTStop = () => setTyping('');
+
+    socket.onMessage(onMsg);
+    socket.onTypingStart(onTStart);
+    socket.onTypingStop(onTStop);
+    return () => {
+      socket.offMessage(onMsg);
+      socket.offTypingStart(onTStart);
+      socket.offTypingStop(onTStop);
+    };
+  }, [socket, user._id]);
