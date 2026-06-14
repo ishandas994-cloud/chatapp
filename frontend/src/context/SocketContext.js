@@ -192,3 +192,14 @@ export function SocketProvider({ children }) {
     }, 1500);
     return () => clearInterval(t);
   }, [user]);
+   const onIncomingCall  = (cb) => { incomingCallCbs.current.push(cb); };
+  const offIncomingCall = (cb) => { incomingCallCbs.current = incomingCallCbs.current.filter(f => f !== cb); };
+  const onCallAnswered  = (cb) => { callAnsweredCbs.current.push(cb); };
+  const offCallAnswered = (cb) => { callAnsweredCbs.current = callAnsweredCbs.current.filter(f => f !== cb); };
+  const onCallRejected  = (cb) => { callRejectedCbs.current.push(cb); };
+  const onCallEnded     = (cb) => { callEndedCbs.current.push(cb); };
+  const onIce           = (cb) => { iceCbs.current.push(cb); };
+  const offIce          = (cb) => { iceCbs.current = iceCbs.current.filter(f => f !== cb); };
+
+  return (
+    <SocketContext.Provider value={{
