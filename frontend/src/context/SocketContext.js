@@ -127,3 +127,19 @@ export function SocketProvider({ children }) {
     setActiveChatId(chatId);
     startPolling(chatId);
   };
+   const sendMessage    = () => {};   // no-op — REST handles delivery
+  const startTyping    = () => {};   // typing indicators need sockets; skip for now
+  const stopTyping     = () => {};
+  const emitRead       = async (chatId) => {
+    try { await axios.post('/api/messages/read', { chatId }); } catch {}
+  };
+
+  // ── Callback registration ─────────────────────────────────────────────────
+  const onMessage       = (cb) => { msgCallbacks.current.push(cb); };
+  const offMessage      = (cb) => { msgCallbacks.current = msgCallbacks.current.filter(f => f !== cb); };
+  const onTypingStart   = (cb) => { typingStartCbs.current.push(cb); };
+  const offTypingStart  = (cb) => { typingStartCbs.current = typingStartCbs.current.filter(f => f !== cb); };
+  const onTypingStop    = (cb) => { typingStopCbs.current.push(cb); };
+  const offTypingStop   = (cb) => { typingStopCbs.current = typingStopCbs.current.filter(f => f !== cb); };
+  const onMessagesRead  = (cb) => { readCbs.current.push(cb); };
+  const offMessagesRead = (cb) => { readCbs.current = readCbs.current.filter(f => f !== cb); };
