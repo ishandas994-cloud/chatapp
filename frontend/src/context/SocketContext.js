@@ -30,7 +30,8 @@ export function SocketProvider({ children }) {
   const pollRef           = useRef(null);
   const chatPollRef       = useRef(null);
   const activeChatIdRef   = useRef(null);
-   // WebRTC signaling via API (stored in DB temporarily)
+
+  // WebRTC signaling via API (stored in DB temporarily)
   const pendingSignals    = useRef(new Set());
 
   // ── Online users poll (every 10s) ─────────────────────────────────────────
@@ -45,7 +46,7 @@ export function SocketProvider({ children }) {
 
     pingOnline();
     fetchOnline();
-     const t1 = setInterval(pingOnline,    10000);
+    const t1 = setInterval(pingOnline,    10000);
     const t2 = setInterval(fetchOnline,   10000);
     return () => { clearInterval(t1); clearInterval(t2); };
   }, [user]);
@@ -67,7 +68,7 @@ export function SocketProvider({ children }) {
           const incoming = newMsgs.filter(m =>
             (m.sender?._id || m.sender) !== user._id
           );
-           incoming.forEach(msg =>
+          incoming.forEach(msg =>
             msgCallbacks.current.forEach(cb => cb(msg))
           );
           // Fire read updates for own messages
@@ -83,7 +84,8 @@ export function SocketProvider({ children }) {
       } catch {}
     }, POLL_INTERVAL);
   }, [user._id]);
-   // ── Chat list polling (sidebar updates) ──────────────────────────────────
+
+  // ── Chat list polling (sidebar updates) ──────────────────────────────────
   useEffect(() => {
     if (!user) return;
     lastChatTime.current = new Date().toISOString();
@@ -101,7 +103,7 @@ export function SocketProvider({ children }) {
               (chat.lastMessage.sender?._id || chat.lastMessage.sender) !== user._id &&
               activeChatIdRef.current !== chat._id
             ) {
-               msgCallbacks.current.forEach(cb => cb({
+              msgCallbacks.current.forEach(cb => cb({
                 ...chat.lastMessage,
                 chatId: chat._id,
                 _chatUpdate: true,
@@ -114,7 +116,8 @@ export function SocketProvider({ children }) {
 
     return () => clearInterval(chatPollRef.current);
   }, [user]);
-// ── Cleanup on unmount ────────────────────────────────────────────────────
+
+  // ── Cleanup on unmount ────────────────────────────────────────────────────
   useEffect(() => {
     return () => {
       clearInterval(pollRef.current);
@@ -127,7 +130,8 @@ export function SocketProvider({ children }) {
     setActiveChatId(chatId);
     startPolling(chatId);
   };
-   const sendMessage    = () => {};   // no-op — REST handles delivery
+
+  const sendMessage    = () => {};   // no-op — REST handles delivery
   const startTyping    = () => {};   // typing indicators need sockets; skip for now
   const stopTyping     = () => {};
   const emitRead       = async (chatId) => {
@@ -143,7 +147,8 @@ export function SocketProvider({ children }) {
   const offTypingStop   = (cb) => { typingStopCbs.current = typingStopCbs.current.filter(f => f !== cb); };
   const onMessagesRead  = (cb) => { readCbs.current.push(cb); };
   const offMessagesRead = (cb) => { readCbs.current = readCbs.current.filter(f => f !== cb); };
- // ── WebRTC — signal via REST ──────────────────────────────────────────────
+
+  // ── WebRTC — signal via REST ──────────────────────────────────────────────
   const initiateCall = async ({ to, from, callType, offer }) => {
     try {
       await axios.post('/api/calls/signal', { to, from, callType, offer, type: 'call:incoming' });
@@ -161,7 +166,8 @@ export function SocketProvider({ children }) {
       await axios.post('/api/calls/signal', { to, type: 'call:rejected' });
     } catch {}
   };
-   const endCall = async ({ to }) => {
+
+  const endCall = async ({ to }) => {
     try {
       await axios.post('/api/calls/signal', { to, type: 'call:ended' });
     } catch {}
@@ -172,7 +178,8 @@ export function SocketProvider({ children }) {
       await axios.post('/api/calls/signal', { to, candidate, type: 'call:ice-candidate' });
     } catch {}
   };
-// Poll for call signals
+
+  // Poll for call signals
   useEffect(() => {
     if (!user) return;
     const t = setInterval(async () => {
@@ -192,7 +199,8 @@ export function SocketProvider({ children }) {
     }, 1500);
     return () => clearInterval(t);
   }, [user]);
-   const onIncomingCall  = (cb) => { incomingCallCbs.current.push(cb); };
+
+  const onIncomingCall  = (cb) => { incomingCallCbs.current.push(cb); };
   const offIncomingCall = (cb) => { incomingCallCbs.current = incomingCallCbs.current.filter(f => f !== cb); };
   const onCallAnswered  = (cb) => { callAnsweredCbs.current.push(cb); };
   const offCallAnswered = (cb) => { callAnsweredCbs.current = callAnsweredCbs.current.filter(f => f !== cb); };
