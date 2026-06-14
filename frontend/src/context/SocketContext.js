@@ -30,3 +30,18 @@ export function SocketProvider({ children }) {
   const pollRef           = useRef(null);
   const chatPollRef       = useRef(null);
   const activeChatIdRef   = useRef(null);
+   // WebRTC signaling via API (stored in DB temporarily)
+  const pendingSignals    = useRef(new Set());
+
+  // ── Online users poll (every 10s) ─────────────────────────────────────────
+  useEffect(() => {
+    if (!user) return;
+
+    const pingOnline = () =>
+      axios.post('/api/users/online', { userId: user._id }).catch(() => {});
+
+    const fetchOnline = () =>
+      axios.get('/api/users/online').then(r => setOnlineUsers(r.data)).catch(() => {});
+
+    pingOnline();
+    fetchOnline();
