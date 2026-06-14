@@ -45,3 +45,25 @@ export function SocketProvider({ children }) {
 
     pingOnline();
     fetchOnline();
+     const t1 = setInterval(pingOnline,    10000);
+    const t2 = setInterval(fetchOnline,   10000);
+    return () => { clearInterval(t1); clearInterval(t2); };
+  }, [user]);
+
+  // ── Message polling for active chat ──────────────────────────────────────
+  const startPolling = useCallback((chatId) => {
+    clearInterval(pollRef.current);
+    activeChatIdRef.current = chatId;
+    lastMsgTime.current = new Date().toISOString();
+
+    pollRef.current = setInterval(async () => {
+      try {
+        const { data: newMsgs } = await axios.get(
+          `/api/messages/${chatId}/poll?since=${lastMsgTime.current}`
+        );
+        if (newMsgs.length > 0) {
+          lastMsgTime.current = newMsgs[newMsgs.length - 1].createdAt;
+          // Only fire for messages NOT from current user
+          const incoming = newMsgs.filter(m =>
+            (m.sender?._id || m.sender) !== user._id
+          );
