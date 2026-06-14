@@ -143,3 +143,16 @@ router.post('/media', auth, upload.single('file'), async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+// POST /api/messages/read — mark messages as read
+router.post('/read', auth, async (req, res) => {
+  try {
+    const { chatId } = req.body;
+    await Message.updateMany(
+      { chatId, readBy: { $ne: req.user._id } },
+      { $addToSet: { readBy: req.user._id } }
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
