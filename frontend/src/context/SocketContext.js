@@ -101,3 +101,16 @@ export function SocketProvider({ children }) {
               (chat.lastMessage.sender?._id || chat.lastMessage.sender) !== user._id &&
               activeChatIdRef.current !== chat._id
             ) {
+               msgCallbacks.current.forEach(cb => cb({
+                ...chat.lastMessage,
+                chatId: chat._id,
+                _chatUpdate: true,
+              }));
+            }
+          });
+        }
+      } catch {}
+    }, POLL_INTERVAL * 2);
+
+    return () => clearInterval(chatPollRef.current);
+  }, [user]);
