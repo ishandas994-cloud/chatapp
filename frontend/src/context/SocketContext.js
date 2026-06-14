@@ -143,3 +143,21 @@ export function SocketProvider({ children }) {
   const offTypingStop   = (cb) => { typingStopCbs.current = typingStopCbs.current.filter(f => f !== cb); };
   const onMessagesRead  = (cb) => { readCbs.current.push(cb); };
   const offMessagesRead = (cb) => { readCbs.current = readCbs.current.filter(f => f !== cb); };
+ // ── WebRTC — signal via REST ──────────────────────────────────────────────
+  const initiateCall = async ({ to, from, callType, offer }) => {
+    try {
+      await axios.post('/api/calls/signal', { to, from, callType, offer, type: 'call:incoming' });
+    } catch {}
+  };
+
+  const answerCall = async ({ to, answer }) => {
+    try {
+      await axios.post('/api/calls/signal', { to, answer, type: 'call:answered' });
+    } catch {}
+  };
+
+  const rejectCall = async ({ to }) => {
+    try {
+      await axios.post('/api/calls/signal', { to, type: 'call:rejected' });
+    } catch {}
+  };
