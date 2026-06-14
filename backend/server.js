@@ -13,17 +13,33 @@ const callRoutes    = require('./routes/calls');
 const app = express();
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
-  .split(',').map(s => s.trim());
-
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin) return cb(null, true);
-    if (allowedOrigins.some(o => origin.startsWith(o))) return cb(null, true);
+
+    const allowed = [
+      'http://localhost:3000',
+      'http://localhost:5000',
+      'chatapp-c2o8-vfowxoutj-ishandas994-clouds-projects.vercel.app',
+      'chatapp-frontend.vercel.app',
+      'ishandas994-clouds-projects.vercel.app',
+    ];
+
+    const isAllowed =
+      allowed.some(a => origin.includes(a)) ||
+      origin.endsWith('.vercel.app');
+
+    if (isAllowed) return cb(null, true);
+
+    console.log('CORS blocked:', origin);
     cb(new Error('Not allowed by CORS'));
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+app.options('*', cors());
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -33,7 +49,6 @@ app.get('/api/health', (_, res) => res.json({
   status: 'ok',
   mongo: process.env.MONGO_URI  ? 'set' : 'MISSING',
   jwt:   process.env.JWT_SECRET ? 'set' : 'MISSING',
-  node:  process.version,
 }));
 
 // ── Routes ────────────────────────────────────────────────────────────────────
