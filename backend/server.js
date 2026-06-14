@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express   = require('express');
 const cors      = require('cors');
 const connectDB = require('./lib/db');
@@ -7,7 +6,7 @@ const authRoutes    = require('./routes/auth');
 const userRoutes    = require('./routes/users');
 const chatRoutes    = require('./routes/chats');
 const messageRoutes = require('./routes/messages');
-const callRoutes = require('./routes/calls');
+const callRoutes    = require('./routes/calls');
 
 const app = express();
 
@@ -17,7 +16,8 @@ const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
 
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.some(o => origin.startsWith(o))) return cb(null, true);
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.some(o => origin.startsWith(o))) return cb(null, true);
     cb(new Error('Not allowed by CORS'));
   },
   credentials: true,
@@ -27,17 +27,19 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // ── Routes ────────────────────────────────────────────────────────────────────
-app.get('/api/health', (_, res) => res.json({ status: 'ok' }));
+app.get('/api/health', (_, res) => res.json({
+  status: 'ok',
+  mongo: process.env.MONGO_URI ? 'set' : 'MISSING',
+  jwt:   process.env.JWT_SECRET ? 'set' : 'MISSING',
+}));
+
 app.use('/api/auth',     authRoutes);
 app.use('/api/users',    userRoutes);
 app.use('/api/chats',    chatRoutes);
 app.use('/api/messages', messageRoutes);
-app.use('/api/calls', callRoutes);
+app.use('/api/calls',    callRoutes);
 
-// ── Start ─────────────────────────────────────────────────────────────────────
-connectDB().then(() => {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => console.log(`🚀 Server → http://localhost:${PORT}`));
-});
+// ── Connect DB then export ────────────────────────────────────────────────────
+connectDB();
 
 module.exports = app;
