@@ -98,3 +98,21 @@ router.get('/chats/poll', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+// POST /api/messages — send text
+router.post('/', auth, async (req, res) => {
+  try {
+    const { chatId, content, type = 'text' } = req.body;
+    if (!chatId || !content)
+      return res.status(400).json({ message: 'chatId and content required' });
+
+    const message = await Message.create({
+      chatId, sender: req.user._id, content, type,
+      readBy: [req.user._id],
+    });
+    await Chat.findByIdAndUpdate(chatId, { lastMessage: message._id, updatedAt: new Date() });
+    const populated = await message.populate('sender', 'name avatar');
+    res.status(201).json(populated);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
