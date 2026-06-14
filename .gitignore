@@ -15,3 +15,4 @@ uploads/
 frontend/package-lock.json
 node_modules
 .env
+node_modules
