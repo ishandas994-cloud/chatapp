@@ -172,3 +172,23 @@ export function SocketProvider({ children }) {
       await axios.post('/api/calls/signal', { to, candidate, type: 'call:ice-candidate' });
     } catch {}
   };
+// Poll for call signals
+  useEffect(() => {
+    if (!user) return;
+    const t = setInterval(async () => {
+      try {
+        const { data: signals } = await axios.get(`/api/calls/signal?userId=${user._id}`);
+        signals.forEach(sig => {
+          if (pendingSignals.current.has(sig._id)) return;
+          pendingSignals.current.add(sig._id);
+
+          if (sig.type === 'call:incoming')    incomingCallCbs.current.forEach(cb => cb(sig));
+          if (sig.type === 'call:answered')    callAnsweredCbs.current.forEach(cb => cb(sig));
+          if (sig.type === 'call:rejected')    callRejectedCbs.current.forEach(cb => cb(sig));
+          if (sig.type === 'call:ended')       callEndedCbs.current.forEach(cb => cb(sig));
+          if (sig.type === 'call:ice-candidate') iceCbs.current.forEach(cb => cb(sig));
+        });
+      } catch {}
+    }, 1500);
+    return () => clearInterval(t);
+  }, [user]);
