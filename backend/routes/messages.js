@@ -156,3 +156,16 @@ router.post('/read', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+// DELETE /api/messages/:id
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    await Message.findByIdAndUpdate(req.params.id, {
+      $addToSet: { deletedFor: req.user._id },
+    });
+    res.json({ message: 'Deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+module.exports = router;
