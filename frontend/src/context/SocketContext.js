@@ -114,3 +114,16 @@ export function SocketProvider({ children }) {
 
     return () => clearInterval(chatPollRef.current);
   }, [user]);
+// ── Cleanup on unmount ────────────────────────────────────────────────────
+  useEffect(() => {
+    return () => {
+      clearInterval(pollRef.current);
+      clearInterval(chatPollRef.current);
+    };
+  }, []);
+
+  // ── Public API (same interface as Socket.IO version) ──────────────────────
+  const joinChat = (chatId) => {
+    setActiveChatId(chatId);
+    startPolling(chatId);
+  };
