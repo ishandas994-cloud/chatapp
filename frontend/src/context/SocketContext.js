@@ -83,3 +83,21 @@ export function SocketProvider({ children }) {
       } catch {}
     }, POLL_INTERVAL);
   }, [user._id]);
+   // ── Chat list polling (sidebar updates) ──────────────────────────────────
+  useEffect(() => {
+    if (!user) return;
+    lastChatTime.current = new Date().toISOString();
+
+    chatPollRef.current = setInterval(async () => {
+      try {
+        const { data: updatedChats } = await axios.get(
+          `/api/messages/chats/poll?since=${lastChatTime.current}`
+        );
+        if (updatedChats.length > 0) {
+          lastChatTime.current = new Date().toISOString();
+          // Notify ChatPage via a special message event carrying chat updates
+          updatedChats.forEach(chat => {
+            if (chat.lastMessage &&
+              (chat.lastMessage.sender?._id || chat.lastMessage.sender) !== user._id &&
+              activeChatIdRef.current !== chat._id
+            ) {
