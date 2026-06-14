@@ -203,3 +203,19 @@ export function SocketProvider({ children }) {
 
   return (
     <SocketContext.Provider value={{
+      onlineUsers, activeChatId,
+      joinChat, sendMessage, startTyping, stopTyping,
+      emitRead, onMessagesRead, offMessagesRead,
+      onMessage, offMessage,
+      onTypingStart, offTypingStart,
+      onTypingStop, offTypingStop,
+      initiateCall, answerCall, rejectCall, endCall, sendIce,
+      onIncomingCall, offIncomingCall,
+      onCallAnswered, offCallAnswered,
+      onCallRejected, onCallEnded,
+      onIce, offIce,
+    }}>
+      {children}
+    </SocketContext.Provider>
+  );
+}
