@@ -65,3 +65,15 @@ router.get('/:chatId/poll', auth, async (req, res) => {
         { _id: { $in: unreadIds } },
         { $addToSet: { readBy: req.user._id } }
       );
+        // Return messages with updated readBy
+      const updated = await Message.find({ _id: { $in: messages.map(m => m._id) } })
+        .populate('sender', 'name avatar')
+        .sort({ createdAt: 1 });
+      return res.json(updated);
+    }
+
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
