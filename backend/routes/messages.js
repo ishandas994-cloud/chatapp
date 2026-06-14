@@ -3,6 +3,7 @@ const Message = require('../models/Message');
 const Chat    = require('../models/Chat');
 const auth    = require('../middleware/auth');
 const { upload } = require('../lib/cloudinary');
+
 // GET /api/messages/:chatId — full message history
 router.get('/:chatId', auth, async (req, res) => {
   try {
@@ -15,7 +16,8 @@ router.get('/:chatId', auth, async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));
-          // Mark as read
+
+    // Mark as read
     const unreadIds = messages
       .filter(m => {
         const sid = m.sender?._id?.toString() || m.sender?.toString();
@@ -36,6 +38,7 @@ router.get('/:chatId', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 // GET /api/messages/:chatId/poll?since=timestamp
 // Returns only NEW messages since the given timestamp — used for polling
 router.get('/:chatId/poll', auth, async (req, res) => {
@@ -51,7 +54,8 @@ router.get('/:chatId/poll', auth, async (req, res) => {
     })
       .populate('sender', 'name avatar')
       .sort({ createdAt: 1 });
- // Mark these as read too
+
+    // Mark these as read too
     const unreadIds = messages
       .filter(m => {
         const sid = m.sender?._id?.toString() || m.sender?.toString();
@@ -65,7 +69,7 @@ router.get('/:chatId/poll', auth, async (req, res) => {
         { _id: { $in: unreadIds } },
         { $addToSet: { readBy: req.user._id } }
       );
-        // Return messages with updated readBy
+      // Return messages with updated readBy
       const updated = await Message.find({ _id: { $in: messages.map(m => m._id) } })
         .populate('sender', 'name avatar')
         .sort({ createdAt: 1 });
@@ -77,6 +81,7 @@ router.get('/:chatId/poll', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 // GET /api/messages/chats/poll?since=timestamp
 // Returns updated chat list (for sidebar refresh)
 router.get('/chats/poll', auth, async (req, res) => {
@@ -98,6 +103,7 @@ router.get('/chats/poll', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 // POST /api/messages — send text
 router.post('/', auth, async (req, res) => {
   try {
@@ -116,6 +122,7 @@ router.post('/', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 // POST /api/messages/media — send file via Cloudinary
 router.post('/media', auth, upload.single('file'), async (req, res) => {
   try {
@@ -136,13 +143,14 @@ router.post('/media', auth, upload.single('file'), async (req, res) => {
       fileType: mime,
       readBy: [req.user._id],
     });
-     await Chat.findByIdAndUpdate(chatId, { lastMessage: message._id, updatedAt: new Date() });
+    await Chat.findByIdAndUpdate(chatId, { lastMessage: message._id, updatedAt: new Date() });
     const populated = await message.populate('sender', 'name avatar');
     res.status(201).json(populated);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
 // POST /api/messages/read — mark messages as read
 router.post('/read', auth, async (req, res) => {
   try {
@@ -156,6 +164,7 @@ router.post('/read', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 // DELETE /api/messages/:id
 router.delete('/:id', auth, async (req, res) => {
   try {
