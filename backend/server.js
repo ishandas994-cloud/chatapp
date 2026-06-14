@@ -69,7 +69,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: err.message || 'Internal server error' });
 });
 
-// ── Connect DB ────────────────────────────────────────────────────────────────
-connectDB();
+// ── Start server locally / export for Vercel ──────────────────────────────────
+connectDB().then(() => {
+  // Only listen when running locally — Vercel handles this itself
+  if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () =>
+      console.log(`🚀 Server → http://localhost:${PORT}`)
+    );
+  }
+});
 
 module.exports = app;
