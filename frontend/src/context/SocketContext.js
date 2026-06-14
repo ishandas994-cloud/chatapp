@@ -67,3 +67,19 @@ export function SocketProvider({ children }) {
           const incoming = newMsgs.filter(m =>
             (m.sender?._id || m.sender) !== user._id
           );
+           incoming.forEach(msg =>
+            msgCallbacks.current.forEach(cb => cb(msg))
+          );
+          // Fire read updates for own messages
+          const readUpdates = newMsgs.filter(m =>
+            (m.sender?._id || m.sender) === user._id
+          );
+          readUpdates.forEach(msg => {
+            readCbs.current.forEach(cb =>
+              cb({ messageIds: [msg._id], userId: msg.readBy?.[msg.readBy.length - 1] })
+            );
+          });
+        }
+      } catch {}
+    }, POLL_INTERVAL);
+  }, [user._id]);
