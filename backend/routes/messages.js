@@ -51,3 +51,17 @@ router.get('/:chatId/poll', auth, async (req, res) => {
     })
       .populate('sender', 'name avatar')
       .sort({ createdAt: 1 });
+ // Mark these as read too
+    const unreadIds = messages
+      .filter(m => {
+        const sid = m.sender?._id?.toString() || m.sender?.toString();
+        return sid !== req.user._id.toString() &&
+          !m.readBy.map(id => id.toString()).includes(req.user._id.toString());
+      })
+      .map(m => m._id);
+
+    if (unreadIds.length > 0) {
+      await Message.updateMany(
+        { _id: { $in: unreadIds } },
+        { $addToSet: { readBy: req.user._id } }
+      );
