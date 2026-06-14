@@ -136,3 +136,10 @@ router.post('/media', auth, upload.single('file'), async (req, res) => {
       fileType: mime,
       readBy: [req.user._id],
     });
+     await Chat.findByIdAndUpdate(chatId, { lastMessage: message._id, updatedAt: new Date() });
+    const populated = await message.populate('sender', 'name avatar');
+    res.status(201).json(populated);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
