@@ -161,3 +161,14 @@ export function SocketProvider({ children }) {
       await axios.post('/api/calls/signal', { to, type: 'call:rejected' });
     } catch {}
   };
+   const endCall = async ({ to }) => {
+    try {
+      await axios.post('/api/calls/signal', { to, type: 'call:ended' });
+    } catch {}
+  };
+
+  const sendIce = async ({ to, candidate }) => {
+    try {
+      await axios.post('/api/calls/signal', { to, candidate, type: 'call:ice-candidate' });
+    } catch {}
+  };
