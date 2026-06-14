@@ -8,24 +8,22 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Storage for chat media (images, video, audio, files)
+// Storage for chat media
 const mediaStorage = new CloudinaryStorage({
   cloudinary,
-  params: async (req, file) => {
-    let folder = 'chatapp/files';
-    if (file.mimetype.startsWith('image/')) folder = 'chatapp/images';
-    else if (file.mimetype.startsWith('video/')) folder = 'chatapp/videos';
-    else if (file.mimetype.startsWith('audio/')) folder = 'chatapp/audio';
-    return { folder, resource_type: 'auto' };
+  params: {
+    folder: 'chatapp/media',
+    resource_type: 'auto',
+    allowed_formats: ['jpg','jpeg','png','gif','webp','mp4','mov','mp3','wav','ogg','pdf','doc','docx','zip'],
   },
 });
 
-// Storage for profile avatars
+// Storage for avatars
 const avatarStorage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'chatapp/avatars',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    allowed_formats: ['jpg','jpeg','png','webp'],
     transformation: [{ width: 200, height: 200, crop: 'fill' }],
   },
 });
