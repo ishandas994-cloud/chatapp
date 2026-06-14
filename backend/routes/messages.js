@@ -36,3 +36,18 @@ router.get('/:chatId', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+// GET /api/messages/:chatId/poll?since=timestamp
+// Returns only NEW messages since the given timestamp — used for polling
+router.get('/:chatId/poll', auth, async (req, res) => {
+  try {
+    const since = req.query.since
+      ? new Date(req.query.since)
+      : new Date(Date.now() - 5000);
+
+    const messages = await Message.find({
+      chatId: req.params.chatId,
+      createdAt: { $gt: since },
+      deletedFor: { $ne: req.user._id },
+    })
+      .populate('sender', 'name avatar')
+      .sort({ createdAt: 1 });
