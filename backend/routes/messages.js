@@ -77,3 +77,24 @@ router.get('/:chatId/poll', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+// GET /api/messages/chats/poll?since=timestamp
+// Returns updated chat list (for sidebar refresh)
+router.get('/chats/poll', auth, async (req, res) => {
+  try {
+    const since = req.query.since
+      ? new Date(req.query.since)
+      : new Date(Date.now() - 5000);
+
+    const chats = await Chat.find({
+      members: req.user._id,
+      updatedAt: { $gt: since },
+    })
+      .populate('members', '-password')
+      .populate({ path: 'lastMessage', populate: { path: 'sender', select: 'name avatar' } })
+      .sort({ updatedAt: -1 });
+
+    res.json(chats);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
