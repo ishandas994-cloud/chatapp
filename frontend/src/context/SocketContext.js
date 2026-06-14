@@ -12,3 +12,21 @@ export function SocketProvider({ children }) {
 
   const [onlineUsers,  setOnlineUsers]  = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
+
+  // Callbacks registered by ChatPage
+  const msgCallbacks      = useRef([]);
+  const typingStartCbs    = useRef([]);
+  const typingStopCbs     = useRef([]);
+  const readCbs           = useRef([]);
+  const incomingCallCbs   = useRef([]);
+  const callAnsweredCbs   = useRef([]);
+  const callRejectedCbs   = useRef([]);
+  const callEndedCbs      = useRef([]);
+  const iceCbs            = useRef([]);
+
+  // Polling state
+  const lastMsgTime       = useRef(new Date().toISOString());
+  const lastChatTime      = useRef(new Date().toISOString());
+  const pollRef           = useRef(null);
+  const chatPollRef       = useRef(null);
+  const activeChatIdRef   = useRef(null);
