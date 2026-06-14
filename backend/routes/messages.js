@@ -15,3 +15,24 @@ router.get('/:chatId', auth, async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));
+          // Mark as read
+    const unreadIds = messages
+      .filter(m => {
+        const sid = m.sender?._id?.toString() || m.sender?.toString();
+        return sid !== req.user._id.toString() &&
+          !m.readBy.map(id => id.toString()).includes(req.user._id.toString());
+      })
+      .map(m => m._id);
+
+    if (unreadIds.length > 0) {
+      await Message.updateMany(
+        { _id: { $in: unreadIds } },
+        { $addToSet: { readBy: req.user._id } }
+      );
+    }
+
+    res.json(messages.reverse());
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
