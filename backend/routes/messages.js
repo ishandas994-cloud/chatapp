@@ -116,3 +116,23 @@ router.post('/', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+// POST /api/messages/media — send file via Cloudinary
+router.post('/media', auth, upload.single('file'), async (req, res) => {
+  try {
+    const { chatId } = req.body;
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+
+    const mime = req.file.mimetype || '';
+    let type = 'file';
+    if (mime.startsWith('image/'))      type = 'image';
+    else if (mime.startsWith('video/')) type = 'video';
+    else if (mime.startsWith('audio/')) type = 'audio';
+
+    const message = await Message.create({
+      chatId, sender: req.user._id,
+      type,
+      fileUrl:  req.file.path,
+      fileName: req.file.originalname,
+      fileType: mime,
+      readBy: [req.user._id],
+    });
