@@ -95,3 +95,8 @@ export default function ChatPage() {
   const activeRef   = useRef(null);
 
   useEffect(() => { activeRef.current = active; }, [active]);
+ // ── Load chats ────────────────────────────────────────────────────────────
+  const loadChats = useCallback(() =>
+    axios.get('/api/chats').then(r => setChats(r.data)).catch(() => {}), []);
+
+  useEffect(() => { loadChats(); }, [loadChats]);
