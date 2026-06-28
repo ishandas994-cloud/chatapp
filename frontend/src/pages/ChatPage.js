@@ -100,3 +100,21 @@ export default function ChatPage() {
     axios.get('/api/chats').then(r => setChats(r.data)).catch(() => {}), []);
 
   useEffect(() => { loadChats(); }, [loadChats]);
+ // ── Incoming messages (polling) ───────────────────────────────────────────
+  useEffect(() => {
+    const onMsg = (msg) => {
+      if (msg._chatUpdate) return;
+      setMessages(prev => [...prev, msg]);
+      setChats(prev =>
+        prev.map(c => c._id === msg.chatId
+          ? { ...c, lastMessage: msg, updatedAt: msg.createdAt } : c)
+          .sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      );
+      if (activeRef.current?._id === msg.chatId) {
+        socket.emitRead(msg.chatId);
+      }
+    };
+    const onTStart = ({ userId, userName }) => {
+      if (userId !== user._id) setTyping(`${userName} is typing...`);
+    };
+    const onTStop = () => setTyping('');
