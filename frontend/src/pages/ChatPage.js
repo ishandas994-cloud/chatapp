@@ -26,3 +26,17 @@ function Ticks({ msg, currentUserId }) {
       </svg>
     </span>
   );
+    return (
+    <span style={tk.wrap} title="Delivered">
+      <svg style={{ ...tk.svg, width:18 }} viewBox="0 0 20 11">
+        <path d="M1 5.5L5.5 10L15 1" style={{ ...tk.path, stroke:'#888' }} />
+        <path d="M5 5.5L9.5 10L19 1" style={{ ...tk.path, stroke:'#888' }} />
+      </svg>
+    </span>
+  );
+}
+const tk = {
+  wrap: { display:'inline-flex', alignItems:'center', marginLeft:4, verticalAlign:'middle' },
+  svg:  { width:16, height:11, fill:'none' },
+  path: { strokeWidth:2, strokeLinecap:'round', strokeLinejoin:'round' },
+};
