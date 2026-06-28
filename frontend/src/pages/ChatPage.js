@@ -118,3 +118,12 @@ export default function ChatPage() {
       if (userId !== user._id) setTyping(`${userName} is typing...`);
     };
     const onTStop = () => setTyping('');
+     socket.onMessage(onMsg);
+    socket.onTypingStart(onTStart);
+    socket.onTypingStop(onTStop);
+    return () => {
+      socket.offMessage(onMsg);
+      socket.offTypingStart(onTStart);
+      socket.offTypingStop(onTStop);
+    };
+  }, [socket, user._id]);
