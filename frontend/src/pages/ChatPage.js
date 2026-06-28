@@ -89,3 +89,9 @@ export default function ChatPage() {
   const [deleteModal, setDeleteModal] = useState(null);
 
   const endRef      = useRef(null);
+    const typingTimer = useRef(null);
+  const fileRef     = useRef(null);
+  const pickerRef   = useRef(null);
+  const activeRef   = useRef(null);
+
+  useEffect(() => { activeRef.current = active; }, [active]);
