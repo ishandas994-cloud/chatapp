@@ -177,3 +177,11 @@ export default function ChatPage() {
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
   }, []);
+  // ── Search users ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!searchQ) { setSearchRes([]); return; }
+    const t = setTimeout(() =>
+      axios.get(`/api/users/search?q=${searchQ}`)
+        .then(r => setSearchRes(r.data)).catch(() => {}), 350);
+    return () => clearTimeout(t);
+  }, [searchQ]);
