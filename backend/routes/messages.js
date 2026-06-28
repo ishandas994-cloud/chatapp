@@ -168,10 +168,25 @@ router.post('/read', auth, async (req, res) => {
 // DELETE /api/messages/:id
 router.delete('/:id', auth, async (req, res) => {
   try {
-    await Message.findByIdAndUpdate(req.params.id, {
-      $addToSet: { deletedFor: req.user._id },
-    });
-    res.json({ message: 'Deleted' });
+    const { everyone } = req.query;
+
+    if (everyone === 'true') {
+      // Delete for everyone — replace content
+      await Message.findByIdAndUpdate(req.params.id, {
+        content:  '🚫 This message was deleted',
+        type:     'text',
+        fileUrl:  '',
+        fileName: '',
+        $addToSet: { deletedFor: req.user._id },
+      });
+    } else {
+      // Delete for me only
+      await Message.findByIdAndUpdate(req.params.id, {
+        $addToSet: { deletedFor: req.user._id },
+      });
+    }
+
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
