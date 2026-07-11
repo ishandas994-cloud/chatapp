@@ -338,3 +338,15 @@ export default function ChatPage() {
       );
     } catch {}
   };
+  // ── React to message ──────────────────────────────────────────────────────
+  const handleReact = async (msgId, emoji) => {
+    setReactionBar(null);
+    try {
+      const { data: updated } = await axios.post(
+        `/api/messages/${msgId}/react`, { emoji }
+      );
+      setMessages(prev =>
+        prev.map(m => m._id === msgId ? { ...m, reactions: updated.reactions } : m)
+      );
+    } catch {}
+  };
