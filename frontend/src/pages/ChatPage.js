@@ -252,3 +252,7 @@ export default function ChatPage() {
       if (unreadIds.length > 0) socket.emitRead(active._id);
     }).catch(() => {});
   }, [active, socket, user._id]);
+  // ── Auto scroll ───────────────────────────────────────────────────────────
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
