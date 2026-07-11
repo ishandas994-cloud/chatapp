@@ -83,3 +83,48 @@ function ReactionBar({ onSelect }) {
     </div>
   );
 }
+// ── Reaction Display ──────────────────────────────────────────────────────────
+function Reactions({ reactions, currentUserId, onReact }) {
+  if (!reactions || reactions.length === 0) return null;
+
+  // Group by emoji
+  const grouped = reactions.reduce((acc, r) => {
+    acc[r.emoji] = acc[r.emoji] || { emoji: r.emoji, count: 0, names: [], mine: false };
+    acc[r.emoji].count++;
+    acc[r.emoji].names.push(r.name);
+    if ((typeof r.userId === 'object' ? r.userId._id : r.userId) === currentUserId)
+      acc[r.emoji].mine = true;
+    return acc;
+  }, {});
+
+  return (
+    <div style={{
+      display:   'flex',
+      flexWrap:  'wrap',
+      gap:       '4px',
+      marginTop: '4px',
+    }}>
+      {Object.values(grouped).map(g => (
+        <button key={g.emoji}
+          onClick={() => onReact(g.emoji)}
+          title={g.names.join(', ')}
+          style={{
+            background:   g.mine ? 'var(--accent-dim)' : 'var(--bg-elevated)',
+            border:       `1px solid ${g.mine ? 'var(--border-accent)' : 'var(--border)'}`,
+            borderRadius: '999px',
+            padding:      '1px 7px',
+            cursor:       'pointer',
+            fontSize:     '0.78rem',
+            display:      'flex',
+            alignItems:   'center',
+            gap:          '3px',
+            color:        'var(--text-primary)',
+            transition:   'all 0.15s',
+          }}>
+          <span>{g.emoji}</span>
+          <span style={{ fontFamily:'var(--mono)', fontSize:'0.72rem' }}>{g.count}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
