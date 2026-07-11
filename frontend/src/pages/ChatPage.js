@@ -256,3 +256,14 @@ export default function ChatPage() {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+   // ── Close picker + reaction bar on outside click ──────────────────────────
+  useEffect(() => {
+    const h = (e) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target))
+        setShowPicker(false);
+      if (!e.target.closest('.reaction-trigger') && !e.target.closest('.reaction-bar-wrap'))
+        setReactionBar(null);
+    };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
