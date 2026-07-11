@@ -307,3 +307,17 @@ export default function ChatPage() {
       setMessages(prev => prev.filter(m => m._id !== tempId));
     }
   };
+ // ── Send file ─────────────────────────────────────────────────────────────
+  const sendFile = async (file) => {
+    if (!file || !active) return;
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('chatId', active._id);
+    try {
+      const { data: msg } = await axios.post('/api/messages/media', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setMessages(prev => [...prev, msg]);
+      socket.sendMessage({ ...msg, chatId: active._id });
+    } catch {}
+  };
