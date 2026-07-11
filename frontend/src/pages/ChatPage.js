@@ -229,3 +229,9 @@ export default function ChatPage() {
     socket.onMessagesRead(onRead);
     return () => socket.offMessagesRead(onRead);
   }, [socket]);
+   // ── Incoming call ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    const cb = (data) => setInCall({ ...data, type: 'incoming' });
+    socket.onIncomingCall(cb);
+    return () => socket.offIncomingCall(cb);
+  }, [socket]);
