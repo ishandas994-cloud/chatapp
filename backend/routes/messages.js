@@ -164,7 +164,44 @@ router.post('/read', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+// POST /api/messages/:id/react — add or remove a reaction
+router.post('/:id/react', auth, async (req, res) => {
+  try {
+    const { emoji } = req.body;
+    if (!emoji) return res.status(400).json({ message: 'emoji required' });
 
+    const message = await Message.findById(req.params.id);
+    if (!message) return res.status(404).json({ message: 'Message not found' });
+
+    const existing = message.reactions.find(
+      r => r.userId.toString() === req.user._id.toString() && r.emoji === emoji
+    );
+
+    if (existing) {
+      // Remove reaction if same emoji clicked again (toggle)
+      message.reactions = message.reactions.filter(
+        r => !(r.userId.toString() === req.user._id.toString() && r.emoji === emoji)
+      );
+    } else {
+      // Remove any previous reaction from this user first
+      message.reactions = message.reactions.filter(
+        r => r.userId.toString() !== req.user._id.toString()
+      );
+      // Add new reaction
+      message.reactions.push({
+        emoji,
+        userId: req.user._id,
+        name:   req.user.name,
+      });
+    }
+
+    await message.save();
+    const populated = await message.populate('sender', 'name avatar');
+    res.json(populated);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 // DELETE /api/messages/:id
 router.delete('/:id', auth, async (req, res) => {
   try {
