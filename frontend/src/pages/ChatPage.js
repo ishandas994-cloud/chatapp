@@ -276,3 +276,34 @@ export default function ChatPage() {
         .then(r => setSearchRes(r.data)).catch(() => {}), 350);
     return () => clearTimeout(t);
   }, [searchQ]);
+   // ── Send text ─────────────────────────────────────────────────────────────
+  const sendMsg = async () => {
+    const text = input.trim();
+    if (!text || !active) return;
+    setInput('');
+    socket.stopTyping(active._id);
+    const tempId  = `temp_${Date.now()}`;
+    const tempMsg = {
+      _id: tempId, _pending: true,
+      chatId: active._id,
+      sender: { _id: user._id, name: user.name, avatar: user.avatar },
+      content: text, type: 'text',
+      readBy: [user._id], reactions: [],
+      createdAt: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, tempMsg]);
+    try {
+      const { data: msg } = await axios.post('/api/messages', {
+        chatId: active._id, content: text, type: 'text',
+      });
+      setMessages(prev => prev.map(m => m._id === tempId ? msg : m));
+      socket.sendMessage({ ...msg, chatId: active._id });
+      setChats(prev =>
+        prev.map(c => c._id === active._id
+          ? { ...c, lastMessage: msg, updatedAt: msg.createdAt } : c)
+          .sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      );
+    } catch {
+      setMessages(prev => prev.filter(m => m._id !== tempId));
+    }
+  };
