@@ -321,3 +321,20 @@ export default function ChatPage() {
       socket.sendMessage({ ...msg, chatId: active._id });
     } catch {}
   };
+   // ── Send GIF / Sticker ────────────────────────────────────────────────────
+  const sendGifOrSticker = async (url) => {
+    setShowPicker(false);
+    if (!active) return;
+    try {
+      const { data: msg } = await axios.post('/api/messages', {
+        chatId: active._id, content: url, type: 'image',
+      });
+      setMessages(prev => [...prev, msg]);
+      socket.sendMessage({ ...msg, chatId: active._id });
+      setChats(prev =>
+        prev.map(c => c._id === active._id
+          ? { ...c, lastMessage: msg, updatedAt: msg.createdAt } : c)
+          .sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      );
+    } catch {}
+  };
