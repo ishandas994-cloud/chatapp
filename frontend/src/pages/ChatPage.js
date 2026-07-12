@@ -40,3 +40,42 @@ const tk = {
   svg:  { width:16, height:11, fill:'none' },
   path: { strokeWidth:2, strokeLinecap:'round', strokeLinejoin:'round' },
 };
+// ── Reply Preview (inside bubble) ─────────────────────────────────────────────
+function ReplyPreview({ replyTo, isOut }) {
+  if (!replyTo?.msgId) return null;
+  return (
+    <div style={{
+      background:   isOut ? 'rgba(0,0,0,0.2)' : 'var(--bg-hover)',
+      borderLeft:   '3px solid',
+      borderColor:  isOut ? 'rgba(255,255,255,0.5)' : 'var(--accent)',
+      borderRadius: '6px',
+      padding:      '0.35rem 0.6rem',
+      marginBottom: '0.4rem',
+      fontSize:     '0.78rem',
+      maxWidth:     '100%',
+      overflow:     'hidden',
+    }}>
+      <div style={{
+        fontWeight: 700,
+        color:      isOut ? 'rgba(255,255,255,0.8)' : 'var(--accent)',
+        marginBottom: 2,
+        fontSize:   '0.72rem',
+      }}>
+        {replyTo.senderName}
+      </div>
+      <div style={{
+        color:        isOut ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)',
+        whiteSpace:   'nowrap',
+        overflow:     'hidden',
+        textOverflow: 'ellipsis',
+      }}>
+        {replyTo.type === 'text'
+          ? replyTo.content
+          : replyTo.type === 'image' ? '📷 Photo'
+          : replyTo.type === 'video' ? '🎥 Video'
+          : replyTo.type === 'audio' ? '🎵 Audio'
+          : `📎 ${replyTo.content}`}
+      </div>
+    </div>
+  );
+}
