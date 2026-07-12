@@ -125,3 +125,39 @@ function ReplyBar({ replyTo, onCancel }) {
     </div>
   );
 }
+// ── Reaction Bar ──────────────────────────────────────────────────────────────
+const EMOJIS = ['👍','❤️','😂','😮','😢','🔥'];
+
+function ReactionBar({ onSelect }) {
+  return (
+    <div style={{
+      position:   'absolute',
+      bottom:     'calc(100% + 6px)',
+      left:       '50%',
+      transform:  'translateX(-50%)',
+      background: 'var(--bg-elevated)',
+      border:     '1px solid var(--border)',
+      borderRadius: '999px',
+      padding:    '0.35rem 0.6rem',
+      display:    'flex',
+      gap:        '0.3rem',
+      zIndex:     50,
+      boxShadow:  '0 8px 24px rgba(0,0,0,0.4)',
+      whiteSpace: 'nowrap',
+      animation:  'msgPop 0.18s cubic-bezier(0.34,1.56,0.64,1)',
+    }}>
+      {EMOJIS.map(e => (
+        <button key={e} onClick={() => onSelect(e)} style={{
+          background: 'none', border: 'none',
+          cursor: 'pointer', fontSize: '1.25rem',
+          padding: '0.1rem 0.15rem', borderRadius: '50%',
+          transition: 'transform 0.15s', lineHeight: 1,
+        }}
+          onMouseEnter={ev => ev.currentTarget.style.transform = 'scale(1.35)'}
+          onMouseLeave={ev => ev.currentTarget.style.transform = 'scale(1)'}>
+          {e}
+        </button>
+      ))}
+    </div>
+  );
+}
