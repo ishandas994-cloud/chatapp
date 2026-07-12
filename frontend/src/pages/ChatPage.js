@@ -340,3 +340,27 @@ export default function ChatPage() {
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
   }, []);
+
+  // ── Search users ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!searchQ) { setSearchRes([]); return; }
+    const t = setTimeout(() =>
+      axios.get(`/api/users/search?q=${searchQ}`)
+        .then(r => setSearchRes(r.data)).catch(() => {}), 350);
+    return () => clearTimeout(t);
+  }, [searchQ]);
+
+  // ── Set reply ─────────────────────────────────────────────────────────────
+  const handleReply = (msg) => {
+    const senderName = msg.sender?.name ||
+      (msg.sender === user._id ? user.name : 'Unknown');
+    setReplyingTo({
+      msgId:      msg._id,
+      content:    msg.content || '',
+      type:       msg.type    || 'text',
+      senderName,
+    });
+    setReactionBar(null);
+    // Focus input
+    setTimeout(() => inputRef.current?.focus(), 100);
+  };
