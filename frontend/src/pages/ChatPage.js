@@ -307,3 +307,20 @@ export default function ChatPage() {
     socket.onIncomingCall(cb);
     return () => socket.offIncomingCall(cb);
   }, [socket]);
+  // ── Load messages ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!active) return;
+    setReplyingTo(null);
+    socket.joinChat(active._id);
+    axios.get(`/api/messages/${active._id}`).then(r => {
+      setMessages(r.data);
+      const unreadIds = r.data
+        .filter(m => {
+          const sid = m.sender?._id || m.sender;
+          return sid !== user._id &&
+            !(m.readBy || []).some(id =>
+              (typeof id === 'object' ? id._id : id) === user._id);
+        }).map(m => m._id);
+      if (unreadIds.length > 0) socket.emitRead(active._id);
+    }).catch(() => {});
+  }, [active, socket, user._id]);
