@@ -79,3 +79,49 @@ function ReplyPreview({ replyTo, isOut }) {
     </div>
   );
 }
+// ── Reply Bar (above input) ───────────────────────────────────────────────────
+function ReplyBar({ replyTo, onCancel }) {
+  if (!replyTo) return null;
+  return (
+    <div style={{
+      display:      'flex',
+      alignItems:   'center',
+      gap:          '0.6rem',
+      padding:      '0.5rem 1rem',
+      background:   'var(--bg-elevated)',
+      borderTop:    '1px solid var(--border)',
+      borderBottom: '1px solid var(--border)',
+    }}>
+      <div style={{
+        flex:       1,
+        borderLeft: '3px solid var(--accent)',
+        paddingLeft: '0.6rem',
+        minWidth:   0,
+      }}>
+        <div style={{ fontSize:'0.72rem', fontWeight:700, color:'var(--accent)' }}>
+          Replying to {replyTo.senderName}
+        </div>
+        <div style={{
+          fontSize:     '0.78rem',
+          color:        'var(--text-secondary)',
+          whiteSpace:   'nowrap',
+          overflow:     'hidden',
+          textOverflow: 'ellipsis',
+        }}>
+          {replyTo.type === 'text'
+            ? replyTo.content
+            : replyTo.type === 'image' ? '📷 Photo'
+            : replyTo.type === 'video' ? '🎥 Video'
+            : replyTo.type === 'audio' ? '🎵 Audio'
+            : `📎 File`}
+        </div>
+      </div>
+      <button onClick={onCancel} style={{
+        background: 'none', border: 'none',
+        color: 'var(--text-muted)', cursor: 'pointer',
+        fontSize: '1.1rem', padding: '0.2rem',
+        flexShrink: 0,
+      }}>✕</button>
+    </div>
+  );
+}
