@@ -17,6 +17,12 @@ const messageSchema = new mongoose.Schema({
   readBy:     [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   deletedFor: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   reactions:  [reactionSchema],
+  replyTo: {
+    msgId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },
+    content: { type: String, default: '' },
+    type:    { type: String, default: 'text' },
+    senderName: { type: String, default: '' },
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Message', messageSchema);
