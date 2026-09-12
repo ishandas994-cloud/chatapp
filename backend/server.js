@@ -1,5 +1,6 @@
 try { require('dotenv').config(); } catch (e) {}
 
+const mongoose     = require('mongoose');
 const express      = require('express');
 const cors         = require('cors');
 const connectDB    = require('./lib/db');
@@ -44,12 +45,31 @@ app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// ── Health check ──────────────────────────────────────────────────────────────
-app.get('/api/health', (_, res) => res.json({
-  status: 'ok',
-  mongo: process.env.MONGO_URI  ? 'set' : 'MISSING',
-  jwt:   process.env.JWT_SECRET ? 'set' : 'MISSING',
-}));
+// ── Health check (available even if DB is down) ─────────────────────────────────
+app.get('/api/health', async (_, res) => {
+  const readyState = mongoose.connection.readyState;
+  const states = ['disconnected', 'connected', 'connecting', 'disconnected'];
+  res.json({
+    status: readyState === 1 ? 'ok' : 'degraded',
+    mongo: process.env.MONGO_URI  ? 'set' : 'MISSING',
+    jwt:   process.env.JWT_SECRET ? 'set' : 'MISSING',
+    dbState: states[readyState],
+  });
+});
+
+// ── Ensure MongoDB is connected before every request ──────────────────────────
+// Critical for Vercel serverless: the connection started at import time may
+// still be pending when the first request lands, causing Mongoose's command
+// buffer to time out (10s).  Awaiting it here guarantees a usable connection.
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('MongoDB connection failed:', err.message);
+    res.status(503).json({ message: 'Database connection error' });
+  }
+});
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/api/auth',     authRoutes);
@@ -70,14 +90,13 @@ app.use((err, req, res, next) => {
 });
 
 // ── Start server locally / export for Vercel ──────────────────────────────────
-connectDB().then(() => {
-  // Only listen when running locally — Vercel handles this itself
-  if (process.env.NODE_ENV !== 'production') {
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () =>
-      console.log(`🚀 Server → http://localhost:${PORT}`)
-    );
-  }
-});
+connectDB()
+  .then(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      const PORT = process.env.PORT || 5000;
+      app.listen(PORT, () => console.log(`🚀 Server → http://localhost:${PORT}`));
+    }
+  })
+  .catch(err => console.error('Initial DB connection failed:', err.message));
 
 module.exports = app;
