@@ -71,6 +71,11 @@ app.use(async (req, res, next) => {
   }
 });
 
+// ── Root route ─────────────────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({ message: 'ChatApp Backend API', endpoints: ['/api/health', '/api/auth', '/api/users', '/api/chats', '/api/messages', '/api/calls'] });
+});
+
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/api/auth',     authRoutes);
 app.use('/api/users',    userRoutes);
@@ -79,6 +84,8 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/calls',    callRoutes);
 
 // ── 404 handler ───────────────────────────────────────────────────────────────
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 app.use((req, res) => {
   res.status(404).json({ message: `Route ${req.method} ${req.url} not found` });
 });
