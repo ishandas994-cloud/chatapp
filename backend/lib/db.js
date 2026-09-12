@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 let isConnected = false;
 let connecting = null;
 
+mongoose.connection.on('connected', () => { isConnected = true; });
+mongoose.connection.on('disconnected', () => { isConnected = false; });
+
 const connectDB = async () => {
   if (isConnected) return;
   // If a connection is already in progress, wait for it instead of racing
@@ -17,6 +20,7 @@ const connectDB = async () => {
 
   connecting = mongoose.connect(uri, {
     serverSelectionTimeoutMS: 10000,
+    maxPoolSize: 1,
   });
 
   try {
@@ -28,7 +32,7 @@ const connectDB = async () => {
     console.error('❌ MongoDB error:', err.message);
     throw err;
   } finally {
-    if (isConnected) connecting = null;
+    connecting = null;
   }
 };
 
